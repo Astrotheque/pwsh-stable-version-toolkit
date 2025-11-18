@@ -1,0 +1,359 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/pwsh-version-facade/log.schema.json",
+  "title": "PwshVersionFacade Log Entry",
+  "description": "Schema for a single JSONL log entry emitted by PwshVersionFacade.ps1",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp with timezone offset"
+    },
+    "runId": {
+      "type": "string",
+      "description": "GUID representing a single execution of the facade",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    },
+    "eventType": {
+      "type": "string",
+      "description": "Type of event logged for this entry",
+      "enum": [
+        "Start",
+        "ModuleLoaded",
+        "ModuleLoadError",
+        "ModuleMissing",
+        "HelpersLoaded",
+        "HelpersLoadError",
+        "HelpersMissing",
+        "CheckResult",
+        "NoUpdateNeeded",
+        "UpdateAvailable",
+        "NonInteractiveSkip",
+        "UserPrompt",
+        "UserSkippedUpdate",
+        "OpenInstallerUrl",
+        "OpenUrlError",
+        "MsiUrlError",
+        "IncompleteData",
+        "UpdateCheckError",
+        "End"
+      ]
+    },
+
+    "currentVersion": {
+      "description": "Installed PowerShell version",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" }
+      ]
+    },
+    "latestStable": {
+      "description": "Latest stable PowerShell version discovered",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" }
+      ]
+    },
+    "updateNeeded": {
+      "type": "boolean",
+      "description": "True if a newer stable version exists (used only in CheckResult)"
+    },
+
+    "rootPath": {
+      "type": "string",
+      "description": "Facade script root directory"
+    },
+    "modulePath": {
+      "type": "string",
+      "description": "Path to PwshStableInfo.psm1"
+    },
+    "helperPath": {
+      "type": "string",
+      "description": "Path to helper script"
+    },
+    "nonInteractive": {
+      "type": "boolean",
+      "description": "Indicates automation/non-interactive mode"
+    },
+
+    "path": {
+      "type": "string",
+      "description": "Path involved in module/helper events"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Reason message used in UpdateCheckError"
+    },
+
+    "prompt": {
+      "type": "string",
+      "description": "Prompt text shown to the user"
+    },
+    "response": {
+      "type": "string",
+      "description": "User response to the prompt"
+    },
+
+    "url": {
+      "type": "string",
+      "description": "URL to MSI or releases page",
+      "format": "uri"
+    },
+    "error": {
+      "type": "string",
+      "description": "Exception or error message"
+    }
+  },
+  "required": [
+    "timestamp",
+    "runId",
+    "eventType"
+  ],
+  "oneOf": [
+    {
+      "title": "Start",
+      "properties": {
+        "eventType": { "const": "Start" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "rootPath",
+        "modulePath",
+        "helperPath"
+      ]
+    },
+    {
+      "title": "ModuleLoaded",
+      "properties": {
+        "eventType": { "const": "ModuleLoaded" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "path"
+      ]
+    },
+    {
+      "title": "ModuleLoadError",
+      "properties": {
+        "eventType": { "const": "ModuleLoadError" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "path",
+        "error"
+      ]
+    },
+    {
+      "title": "ModuleMissing",
+      "properties": {
+        "eventType": { "const": "ModuleMissing" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "path"
+      ]
+    },
+    {
+      "title": "HelpersLoaded",
+      "properties": {
+        "eventType": { "const": "HelpersLoaded" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "path"
+      ]
+    },
+    {
+      "title": "HelpersLoadError",
+      "properties": {
+        "eventType": { "const": "HelpersLoadError" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "path",
+        "error"
+      ]
+    },
+    {
+      "title": "HelpersMissing",
+      "properties": {
+        "eventType": { "const": "HelpersMissing" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "path"
+      ]
+    },
+    {
+      "title": "CheckResult",
+      "properties": {
+        "eventType": { "const": "CheckResult" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "currentVersion",
+        "latestStable",
+        "updateNeeded"
+      ]
+    },
+    {
+      "title": "NoUpdateNeeded",
+      "properties": {
+        "eventType": { "const": "NoUpdateNeeded" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "currentVersion",
+        "latestStable"
+      ]
+    },
+    {
+      "title": "UpdateAvailable",
+      "properties": {
+        "eventType": { "const": "UpdateAvailable" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "currentVersion",
+        "latestStable"
+      ]
+    },
+    {
+      "title": "NonInteractiveSkip",
+      "properties": {
+        "eventType": { "const": "NonInteractiveSkip" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "currentVersion",
+        "latestStable"
+      ]
+    },
+    {
+      "title": "UserPrompt",
+      "properties": {
+        "eventType": { "const": "UserPrompt" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "prompt",
+        "response"
+      ]
+    },
+    {
+      "title": "UserSkippedUpdate",
+      "properties": {
+        "eventType": { "const": "UserSkippedUpdate" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "currentVersion",
+        "latestStable",
+        "response"
+      ]
+    },
+    {
+      "title": "OpenInstallerUrl",
+      "properties": {
+        "eventType": { "const": "OpenInstallerUrl" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "url"
+      ]
+    },
+    {
+      "title": "OpenUrlError",
+      "properties": {
+        "eventType": { "const": "OpenUrlError" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "url",
+        "error"
+      ]
+    },
+    {
+      "title": "MsiUrlError",
+      "properties": {
+        "eventType": { "const": "MsiUrlError" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "error"
+      ]
+    },
+    {
+      "title": "IncompleteData",
+      "properties": {
+        "eventType": { "const": "IncompleteData" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "currentVersion",
+        "latestStable"
+      ]
+    },
+    {
+      "title": "UpdateCheckError",
+      "properties": {
+        "eventType": { "const": "UpdateCheckError" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "reason"
+      ]
+    },
+    {
+      "title": "End",
+      "properties": {
+        "eventType": { "const": "End" }
+      },
+      "required": [
+        "timestamp",
+        "runId",
+        "eventType",
+        "currentVersion",
+        "latestStable"
+      ]
+    }
+  ]
+}
